@@ -6,6 +6,15 @@ Your task is to create automated tests based on the test cases described below.
 
 ---
 
+## ⚠️ How to Submit
+
+> **You must do both of these — missing either means your work won't be graded.**
+
+1. **Open a Pull Request** to the original repository: [github.com/tanjaq/playwright-kriso](https://github.com/tanjaq/playwright-kriso)
+2. **Paste the link to a passing CI run** in the PR description (GitHub Actions → your workflow run → copy the URL)
+
+---
+
 ## How to Get Started
 
 1. **Fork** this repository into your own GitHub account
@@ -23,12 +32,9 @@ Your task is to create automated tests based on the test cases described below.
    ```bash
    npx playwright test
    ```
-6. **Commit** your changes
-7. **Create a Pull Request** back to the original repository
-
-You will be graded if:
-- Tests are completed
-- Page Object Pattern is followed (Part II)
+6. **Commit and push** your changes to your fork
+7. **Open a Pull Request** to `tanjaq/playwright-kriso` ← do not skip this
+8. **Add the CI link** to your PR description ← do not skip this
 
 ---
 
@@ -124,5 +130,6 @@ Refactor your Part I tests to use the Page Object Model:
 - Create page classes in `pages/` (already scaffolded)
 - Use `tests/fixtures.ts` to inject page objects automatically
 - No raw selectors in test files — all locators live in page classes
-- Add `.github/workflows/playwright.yml` and confirm the CI run goes green
-- Share the link to your passing CI run
+- The CI pipeline in `.github/workflows/playwright.yml` is already set up — push your code and confirm the run goes green
+
+> **Reminder:** Open a PR and paste the passing CI link in the description. That's how you submit.
