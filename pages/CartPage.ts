@@ -40,4 +40,23 @@ export class CartPage extends BasePage {
   async removeItemByIndex(index: number) {
     await this.removeButton.nth(index).click();
   }
+
+  async getBasketSum(): Promise<number> {
+    const cartItems = await this.cartSubtotals.all();
+    let cartItemsSum = 0;
+
+    for (const item of cartItems) {
+      const text = await item.textContent();
+      const price = Number((text || '').replace(/[^0-9.,]+/g, '').replace(',', '.')) || 0;
+      cartItemsSum += price;
+    }
+
+    return cartItemsSum;
+  }
+
+  async getBasketSumTotal(): Promise<number> {
+    const basketSumTotalText = await this.cartTotal.textContent();
+    const basketSumTotal = Number((basketSumTotalText || '').replace(/[^0-9.,]+/g, '').replace(',', '.')) || 0;
+    return basketSumTotal;
+  }
 }
