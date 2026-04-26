@@ -10,12 +10,10 @@
  */
 import { test, expect } from '@playwright/test';
 import type { Page } from '@playwright/test';
-import { HomePage } from '../../pages/HomePage';
 
 test.describe.configure({ mode: 'serial' });
 
 let page: Page;
-let homePage: HomePage;
 
 test.describe('Search for Books by Keywords', () => {
 
@@ -23,10 +21,11 @@ test.describe('Search for Books by Keywords', () => {
     const context = await browser.newContext();
     page = await context.newPage();
 
-    homePage = new HomePage(page);
-
-    await homePage.openUrl();
-    await homePage.acceptCookies();
+    await page.goto('https://www.kriso.ee/');
+    const cookieButton = page.getByRole('button', { name: 'Nõustun' });
+    if (await cookieButton.isVisible()) {
+      await cookieButton.click();
+    }
   });
 
   test.afterAll(async () => {
@@ -34,23 +33,30 @@ test.describe('Search for Books by Keywords', () => {
   });
 
   test('Test logo is visible', async () => {
-    await homePage.verifyLogo();
+    const logo = page.locator('.logo-icon');
+    await expect(logo).toBeVisible();
   });
 
   test('Test no products found', async () => {
-    await homePage.searchByKeyword('jaslkfjalskjdkls');
-    await homePage.verifyNoProductsFoundMessage();
+    await page.locator('#top-search-text').click();
+    await page.locator('#top-search-text').fill('jaslkfjalskjdkls');
+    await page.locator('#top-search-btn-wrap').click();
+
+    await expect(page.locator('.msg.msg-info')).toContainText('Teie poolt sisestatud märksõnale vastavat raamatut ei leitud. Palun proovige uuesti!');
   });
 
   test('Test search results contain keyword', async () => {
-    await homePage.searchByKeyword('tolkien');
-    await homePage.verifyResultsCountMoreThan(1);
+    await page.locator('#top-search-text').click();
+    await page.locator('#top-search-text').fill('tolkien');
+    await page.locator('#top-search-btn-wrap').click();
 
     //TODO check results contain keyword
   });
 
   test('Test search by ISBN', async () => {
-    await homePage.searchByKeyword('9780307588371');
+    await page.locator('#top-search-text').click();
+    await page.locator('#top-search-text').fill('9780307588371');
+    await page.locator('#top-search-btn-wrap').click();
 
     //TODO check correct book is shown
   });

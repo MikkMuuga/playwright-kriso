@@ -7,30 +7,37 @@
  *   - Use only: getByRole, getByText, getByPlaceholder, getByLabel
  */
 import { test, expect } from '@playwright/test';
-import type { Page } from '@playwright/test';
-import { HomePage } from '../../pages/HomePage';
-
-test.describe.configure({ mode: 'serial' });
-
-let page: Page;
-let homePage: HomePage;
+import { FiltersPage } from '../../pages/FiltersPage';
 
 test.describe('Navigate Products via Filters (POM)', () => {
 
-  test.beforeAll(async ({ browser }) => {
-    const context = await browser.newContext();
-    page = await context.newPage();
+  test('should navigate and filter products', async ({ page }) => {
+    const filtersPage = new FiltersPage(page);
 
-    homePage = new HomePage(page);
+    await filtersPage.navigate();
+    await expect(page).toHaveTitle(/Krisostomus/i);
 
-    await homePage.openUrl();
-    await homePage.acceptCookies();
+    await filtersPage.openGuitarResults();
+    await expect(page).toHaveURL(/instrument=Guitar/);
+
+    const initialCount = await filtersPage.getProductCount();
+    expect(initialCount).toBeGreaterThan(1);
+
+    await filtersPage.openEnglishGuitarResults();
+    await expect(page).toHaveURL(/mlanguage=English/);
+
+    const countAfterLanguageFilter = await filtersPage.getProductCount();
+    expect(countAfterLanguageFilter).toBeLessThanOrEqual(initialCount);
+
+    await filtersPage.openEnglishCdGuitarResults();
+    await expect(page).toHaveURL(/format=CD/);
+
+    const countAfterCdFilter = await filtersPage.getProductCount();
+    expect(countAfterCdFilter).toBeLessThanOrEqual(countAfterLanguageFilter);
+
+    await filtersPage.openGuitarResults();
+    const finalCount = await filtersPage.getProductCount();
+    expect(finalCount).toBeGreaterThanOrEqual(countAfterCdFilter);
   });
-
-  test.afterAll(async () => {
-    await page.context().close();
-  });
-
-  // TODO: implement tests
 
 });
