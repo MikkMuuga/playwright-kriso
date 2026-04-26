@@ -17,10 +17,12 @@ export class FiltersPage {
     await this.acceptCookies();
   }
 
-  async acceptCookies() {
-    const cookieBtn = this.page.getByRole('button', { name: 'Nõustun' });
-    if (await cookieBtn.isVisible()) {
+    async acceptCookies() {
+    const cookieBtn = this.page.getByRole('button', { name: /nõustun|accept/i }).first();
+    try {
+      await cookieBtn.waitFor({ state: 'visible', timeout: 3000 });
       await cookieBtn.click();
+    } catch {
     }
   }
 

@@ -55,6 +55,26 @@ export class HomePage extends BasePage {
   }
 
   async verifyNoProductsFoundMessage() {
-    await expect(this.noResultsMessage).toContainText('Teie poolt sisestatud märksõnale vastavat raamatut ei leitud. Palun proovige uuesti!');
+        await expect(this.noResultsMessage).toContainText(/Teie poolt sisestatud märksõnale|The search did not find any match/i);
+  }
+  
+  async verifyResultsContainKeyword(keyword: string) {
+    const items = this.page.locator('.list-item');
+    const count = await items.count();
+    expect(count).toBeGreaterThan(0);
+
+    let found = false;
+    for (let i = 0; i < count; i++) {
+      const text = await items.nth(i).textContent();
+      if (text && text.toLowerCase().includes(keyword.toLowerCase())) {
+        found = true;
+        break;
+      }
+    }
+    expect(found, `Expected at least one result to contain "${keyword}"`).toBe(true);
+  }
+
+  async verifyBookTitleVisible(title: string) {
+    await expect(this.page.getByText(title, { exact: false }).first()).toBeVisible();
   }
 }

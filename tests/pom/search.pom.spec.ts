@@ -45,14 +45,12 @@ test.describe('Search for Books by Keywords (POM)', () => {
   test('Test search results contain keyword', async () => {
     await homePage.searchByKeyword('tolkien');
     await homePage.verifyResultsCountMoreThan(1);
-
-    //TODO check results contain keyword
+    await homePage.verifyResultsContainKeyword('tolkien');
   });
 
   test('Test search by ISBN', async () => {
     await homePage.searchByKeyword('9780307588371');
-
-    //TODO check correct book is shown
+    await homePage.verifyBookTitleVisible('Gone Girl');
   });
 
 });

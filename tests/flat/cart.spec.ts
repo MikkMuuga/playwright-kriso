@@ -23,9 +23,11 @@ test.describe('Add Books to Shopping Cart', () => {
     page = await context.newPage();
 
     await page.goto('https://www.kriso.ee/');
-    const cookieButton = page.getByRole('button', { name: 'Nõustun' });
-    if (await cookieButton.isVisible()) {
+    const cookieButton = page.getByRole('button', { name: /nõustun|accept/i }).first();
+    try {
+      await cookieButton.waitFor({ state: 'visible', timeout: 3000 });
       await cookieButton.click();
+    } catch {
     }
   });
 
@@ -41,9 +43,9 @@ test.describe('Add Books to Shopping Cart', () => {
   });
 
   test('Test search by keyword', async () => {
-    await page.getByRole('textbox', { name: 'Pealkiri, autor, ISBN, märksõ' }).click();
-    await page.getByRole('textbox', { name: 'Pealkiri, autor, ISBN, märksõ' }).fill('harry potter');
-    await page.getByRole('button', { name: 'Search' }).click();
+    await page.getByPlaceholder(/Pealkiri, autor/i).first().click();
+    await page.getByPlaceholder(/Pealkiri, autor/i).first().fill('harry potter');
+    await page.getByRole('button', { name: /search/i }).click();
 
     // parse numeric total from the results text and assert it's > 1
     const resultsText = await page.locator('.sb-results-total').textContent();

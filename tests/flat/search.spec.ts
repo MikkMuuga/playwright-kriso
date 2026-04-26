@@ -22,14 +22,18 @@ test.describe('Search for Books by Keywords', () => {
     page = await context.newPage();
 
     await page.goto('https://www.kriso.ee/');
-    const cookieButton = page.getByRole('button', { name: 'Nõustun' });
-    if (await cookieButton.isVisible()) {
+    const cookieButton = page.getByRole('button', { name: /nõustun|accept/i }).first();
+    try {
+      await cookieButton.waitFor({ state: 'visible', timeout: 3000 });
       await cookieButton.click();
+    } catch {
     }
   });
 
   test.afterAll(async () => {
-    await page.context().close();
+    if (page) {
+      await page.context().close();
+    }
   });
 
   test('Test logo is visible', async () => {
@@ -42,7 +46,7 @@ test.describe('Search for Books by Keywords', () => {
     await page.locator('#top-search-text').fill('jaslkfjalskjdkls');
     await page.locator('#top-search-btn-wrap').click();
 
-    await expect(page.locator('.msg.msg-info')).toContainText('Teie poolt sisestatud märksõnale vastavat raamatut ei leitud. Palun proovige uuesti!');
+    await expect(page.locator('.msg.msg-info')).toContainText(/Teie poolt sisestatud märksõnale|The search did not find any match/i);
   });
 
   test('Test search results contain keyword', async () => {
@@ -50,7 +54,19 @@ test.describe('Search for Books by Keywords', () => {
     await page.locator('#top-search-text').fill('tolkien');
     await page.locator('#top-search-btn-wrap').click();
 
-    //TODO check results contain keyword
+    const items = page.locator('.list-item');
+    await expect(items.first()).toBeVisible();
+
+    const count = await items.count();
+    let found = false;
+    for (let i = 0; i < count; i++) {
+      const text = await items.nth(i).textContent();
+      if (text && text.toLowerCase().includes('tolkien')) {
+        found = true;
+        break;
+      }
+    }
+    expect(found, 'Expected one "tolkien"').toBe(true);
   });
 
   test('Test search by ISBN', async () => {
@@ -58,7 +74,7 @@ test.describe('Search for Books by Keywords', () => {
     await page.locator('#top-search-text').fill('9780307588371');
     await page.locator('#top-search-btn-wrap').click();
 
-    //TODO check correct book is shown
+    await expect(page.getByText('Gone Girl', { exact: false }).first()).toBeVisible();
   });
 
 });

@@ -32,7 +32,9 @@ test.describe('Add Books to Shopping Cart (POM)', () => {
   });
 
   test.afterAll(async () => {
-    await page.context().close();
+    if (page) {
+      await page.context().close();
+    }
   });
 
   test('Test logo is visible', async () => {
